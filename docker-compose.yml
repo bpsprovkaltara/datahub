@@ -44,18 +44,6 @@ services:
     networks:
       - prefect-network
 
-  # ── Cloudflare Tunnel ────────────────────────────────────────────
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run
-    environment:
-      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
-    depends_on:
-      prefect-server:
-        condition: service_healthy
-    networks:
-      - prefect-network
 
   # ── Prefect Worker (Docker type) ─────────────────────────────────
   prefect-worker:

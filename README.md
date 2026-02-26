@@ -28,26 +28,10 @@ datahub.kaltarastats.id
 - Akun Cloudflare dengan domain `kaltarastats.id` terdaftar
 - Python 3.9+ dan `pip install prefect` (untuk CLI lokal)
 
-## Setup Cloudflare Tunnel
+## Catatan Cloudflare Tunnel
 
-### 1. Buat Tunnel di Cloudflare Dashboard
-
-1. Buka **Cloudflare Zero Trust** → [one.dash.cloudflare.com](https://one.dash.cloudflare.com)
-2. Navigasi ke **Networks → Tunnels**
-3. Klik **Create a tunnel** → pilih **Cloudflared**
-4. Beri nama tunnel, misalnya `datahub`
-5. Pada tab **Public Hostname**, tambahkan:
-   - **Subdomain**: `datahub`
-   - **Domain**: `kaltarastats.id`
-   - **Service Type**: `HTTP`
-   - **URL**: `prefect-server:4200`
-6. Salin **Tunnel Token** yang ditampilkan
-
-### 2. Isi Token di `.env`
-
-```bash
-CLOUDFLARE_TUNNEL_TOKEN=isi_token_tunnel_anda_di_sini
-```
+Cloudflared dijalankan secara terpisah di luar Docker Compose ini.
+Pastikan tunnel sudah dikonfigurasi untuk meneruskan traffic `datahub.kaltarastats.id` → `localhost:4200`.
 
 ## Quick Start
 
@@ -159,7 +143,6 @@ Atau klik **Run** di Prefect UI pada halaman deployment.
 
 - UI: https://datahub.kaltarastats.id
 - Log worker: `docker compose logs -f prefect-worker`
-- Log tunnel: `docker compose logs -f cloudflared`
 
 ## Perintah Berguna
 
@@ -184,8 +167,8 @@ prefect worker ls
 
 ```
 datahub/
-├── docker-compose.yml   # Service definitions (postgres, server, worker, cloudflared)
-├── .env                 # Environment variables (credentials, domain, tunnel token)
+├── docker-compose.yml   # Service definitions (postgres, server, worker)
+├── .env                 # Environment variables (credentials, domain publik)
 ├── README.md            # Dokumentasi ini
 └── flows/
     └── hello_world.py   # Contoh flow sederhana
@@ -198,9 +181,7 @@ datahub/
 - Ini terjadi jika browser mencoba memanggil API ke `localhost` alih-alih domain publik
 
 **Tunnel tidak konek:**
-- Pastikan `CLOUDFLARE_TUNNEL_TOKEN` di `.env` sudah diisi dengan token yang benar
-- Cek log: `docker compose logs cloudflared`
-- Pastikan public hostname di Cloudflare dashboard mengarah ke `prefect-server:4200`
+- Pastikan cloudflared yang berjalan terpisah sudah dikonfigurasi mengarah ke `localhost:4200`
 
 **Worker tidak konek ke server:**
 - Pastikan work pool sudah dibuat dengan nama yang sesuai di `.env`
