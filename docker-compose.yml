@@ -21,16 +21,17 @@ services:
   prefect-server:
     image: prefecthq/prefect:3-latest
     restart: unless-stopped
-    command: prefect server start --host 0.0.0.0
+    command: >
+      prefect server start
+        --host 0.0.0.0
+        --ui-api-url https://${PUBLIC_DOMAIN}/api
     ports:
       - "${PREFECT_UI_PORT:-4200}:4200"
     environment:
       PREFECT_API_DATABASE_CONNECTION_URL: "postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       PREFECT_SERVER_API_HOST: "0.0.0.0"
-      # Beritahu browser untuk memanggil API via domain publik (bukan localhost)
       PREFECT_UI_API_URL: "https://${PUBLIC_DOMAIN}/api"
-      # Izinkan request dari domain publik (CORS)
-      PREFECT_SERVER_CORS_ALLOWED_ORIGINS: "https://${PUBLIC_DOMAIN}"
+      PREFECT_SERVER_CORS_ALLOWED_ORIGINS: "https://${PUBLIC_DOMAIN},http://localhost:4200"
     depends_on:
       postgres:
         condition: service_healthy
