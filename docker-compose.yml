@@ -21,10 +21,7 @@ services:
   prefect-server:
     image: prefecthq/prefect:3-latest
     restart: unless-stopped
-    command: >
-      prefect server start
-        --host 0.0.0.0
-        --ui-api-url https://${PUBLIC_DOMAIN}/api
+    command: prefect server start --host 0.0.0.0
     ports:
       - "${PREFECT_UI_PORT:-4200}:4200"
     environment:
