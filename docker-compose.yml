@@ -30,6 +30,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      # Tunggu hingga API endpoint /api/health benar-benar merespons
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4200/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     networks:
       - prefect-network
 
@@ -42,11 +49,13 @@ services:
         --pool "${PREFECT_WORK_POOL_NAME}"
         --type docker
     environment:
+      # Gunakan hostname Docker internal, bukan 0.0.0.0 atau localhost
       PREFECT_API_URL: "http://prefect-server:4200/api"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
-      - prefect-server
+      prefect-server:
+        condition: service_healthy
     networks:
       - prefect-network
 
