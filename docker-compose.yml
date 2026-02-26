@@ -69,4 +69,5 @@ volumes:
 
 networks:
   prefect-network:
-    driver: bridge
+    external: true
+    name: datahub_prefect-network
